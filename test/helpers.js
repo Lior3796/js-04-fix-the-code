@@ -28,9 +28,15 @@ export function captureConsole(fn) {
   return lines;
 }
 
+// Removes terminal color codes, e.g. "\u001b[33m14\u001b[39m" -> "14".
+const stripColors = (text) => text.replace(/\u001b\[[0-9;]*m/g, "");
+
 // Runs a student file with node (like "node challenge1-greeting/main.js") and returns its output lines.
 export function runScript(relativePath, { timeout = 5000 } = {}) {
-  const result = spawnSync(process.execPath, [path.join(ROOT, relativePath)], { cwd: ROOT, encoding: "utf8", timeout });
+  // Without colors: when FORCE_COLOR is set, console.log prints numbers in color.
+  const env = { ...process.env, NO_COLOR: "1" };
+  delete env.FORCE_COLOR;
+  const result = spawnSync(process.execPath, [path.join(ROOT, relativePath)], { cwd: ROOT, env, encoding: "utf8", timeout });
   if (result.error?.code === "ETIMEDOUT") {
     throw new Error(`${relativePath} did not finish within ${timeout / 1000}s - is it stuck in a loop?`);
   }
@@ -38,5 +44,5 @@ export function runScript(relativePath, { timeout = 5000 } = {}) {
     const firstError = result.stderr.split(/\r?\n/).find((line) => /Error/.test(line)) || result.stderr.trim();
     throw new Error(`running ${relativePath} crashed: ${firstError}`);
   }
-  return result.stdout.split(/\r?\n/).filter((line) => line.trim() !== "");
+  return stripColors(result.stdout).split(/\r?\n/).filter((line) => line.trim() !== "");
 }
