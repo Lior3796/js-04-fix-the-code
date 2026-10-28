@@ -1,0 +1,13 @@
+{
+  "name": "js-04-fix-the-code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Exercise 4 - JavaScript Fix the Code challenges (modules, conditions, loops) - starter with tests",
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-reporter=./test/reporter.mjs test/challenge1.test.js test/challenge2.test.js test/challenge3.test.js test/challenge4.test.js test/challenge5.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
